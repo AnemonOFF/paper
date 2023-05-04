@@ -1,4 +1,11 @@
-import { Button, Group, Paper, SimpleGrid, TextInput } from "@mantine/core";
+import {
+	Button,
+	Group,
+	Paper,
+	SimpleGrid,
+	TextInput,
+	useMantineTheme,
+} from "@mantine/core";
 import { FileRejection, FileWithPath } from "@mantine/dropzone";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -27,6 +34,7 @@ const ProfileCard: React.FC<Props> = ({
 	initialAvatarUrl,
 }) => {
 	const router = useRouter();
+	const theme = useMantineTheme();
 	const { classes } = useProfileCardStyles();
 	const [previewUrl, setPreviewUrl] = useState<string | undefined>(
 		() => initialAvatarUrl
@@ -98,7 +106,7 @@ const ProfileCard: React.FC<Props> = ({
 	return (
 		<Paper className={classes.wrapper} p="md" withBorder shadow="xl">
 			<form onSubmit={onFormSubmit}>
-				<Group align="stretch" spacing="md" w="100%">
+				<div className={classes.avatarGrid}>
 					<PreviewDropzone
 						onDrop={onAvatarDrop}
 						onReject={onAvatarReject}
@@ -108,7 +116,11 @@ const ProfileCard: React.FC<Props> = ({
 						previewUrl={previewUrl}
 						{...form.getInputProps("avatar")}
 					/>
-					<SimpleGrid cols={2} className={classes.grid}>
+					<SimpleGrid
+						cols={2}
+						breakpoints={[{ maxWidth: "sm", cols: 1 }]}
+						className={classes.grid}
+					>
 						<TextInput
 							label="Username"
 							required
@@ -119,8 +131,15 @@ const ProfileCard: React.FC<Props> = ({
 							{...form.getInputProps("fullname")}
 						/>
 					</SimpleGrid>
+				</div>
+				<Group
+					w="100%"
+					align="center"
+					mt="md"
+					sx={{ justifyContent: "end" }}
+				>
+					<Button type="submit">Save profile</Button>
 				</Group>
-				<Button type="submit">Save</Button>
 			</form>
 		</Paper>
 	);
