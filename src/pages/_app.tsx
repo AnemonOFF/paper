@@ -16,7 +16,8 @@ export default function App({
 	pageProps,
 	colorScheme: propsColorScheme,
 }: AppProps & { colorScheme: ColorScheme }) {
-	const { colorScheme, toggleColorScheme } = useTheme(propsColorScheme);
+	const { theme, colorScheme, toggleColorScheme } =
+		useTheme(propsColorScheme);
 	const queryClient = useAppQueryClient();
 
 	return (
@@ -36,7 +37,7 @@ export default function App({
 					<MantineProvider
 						withGlobalStyles
 						withNormalizeCSS
-						theme={{ colorScheme }}
+						theme={theme}
 					>
 						<Notifications position="top-right" />
 						<Component {...pageProps} />

@@ -1,7 +1,11 @@
-import { ColorScheme } from "@mantine/core";
+import { ColorScheme, MantineThemeOverride } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
 import { setCookie } from "cookies-next";
 import { useEffect, useState } from "react";
+
+const overrideTheme: MantineThemeOverride = {
+	defaultRadius: "md",
+};
 
 const useTheme = (forceTheme?: ColorScheme) => {
 	const preferredColorScheme = useColorScheme();
@@ -11,11 +15,11 @@ const useTheme = (forceTheme?: ColorScheme) => {
 
 	useEffect(() => {
 		if (forceTheme === undefined) {
-            setColorScheme(preferredColorScheme);
-            setCookie("mantine-color-scheme", preferredColorScheme, {
-                maxAge: 60 * 60 * 24 * 30,
-            });
-        }
+			setColorScheme(preferredColorScheme);
+			setCookie("mantine-color-scheme", preferredColorScheme, {
+				maxAge: 60 * 60 * 24 * 30,
+			});
+		}
 	}, [forceTheme, preferredColorScheme]);
 
 	const toggleColorScheme = (value?: ColorScheme) => {
@@ -27,7 +31,13 @@ const useTheme = (forceTheme?: ColorScheme) => {
 		});
 	};
 
+	const theme: MantineThemeOverride = {
+		...overrideTheme,
+		colorScheme,
+	};
+
 	return {
+		theme,
 		colorScheme,
 		toggleColorScheme,
 	};

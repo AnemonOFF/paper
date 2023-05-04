@@ -5,21 +5,18 @@ import axios from "axios";
 import { useCallback, useState } from "react";
 
 const useAppQueryClient = () => {
-	const onQueryError = useCallback(
-		(err: unknown) => {
-			let errorMessage;
-			if (axios.isAxiosError(err) && err.response) {
-				errorMessage = err.response.data.error?.message ?? err.message;
-			} else if (err instanceof Error) errorMessage = err.message;
-			notifications.show({
-				title: "Ошибка запроса",
-				message: errorMessage,
-				icon: <IconX />,
-				color: "red",
-			});
-		},
-		[]
-	);
+	const onQueryError = useCallback((err: unknown) => {
+		let errorMessage;
+		if (axios.isAxiosError(err) && err.response) {
+			errorMessage = err.response.data.error?.message ?? err.message;
+		} else if (err instanceof Error) errorMessage = err.message;
+		notifications.show({
+			title: "Ошибка запроса",
+			message: errorMessage,
+			icon: <IconX />,
+			color: "red",
+		});
+	}, []);
 
 	const [queryClient] = useState(
 		() =>
