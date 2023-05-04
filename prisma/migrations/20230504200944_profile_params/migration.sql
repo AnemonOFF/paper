@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `profile` ADD COLUMN `email` VARCHAR(191) NULL,
+    ADD COLUMN `phone` VARCHAR(191) NULL,
+    ADD COLUMN `telegram` VARCHAR(191) NULL,
+    ADD COLUMN `url` VARCHAR(191) NULL;

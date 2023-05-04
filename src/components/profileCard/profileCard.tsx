@@ -7,7 +7,7 @@ import {
 	useMantineTheme,
 } from "@mantine/core";
 import { FileRejection, FileWithPath } from "@mantine/dropzone";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { isEmail, isNotEmpty, matches, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { Prisma } from "@prisma/client";
 import { IconX } from "@tabler/icons-react";
@@ -19,6 +19,10 @@ import useProfileCardStyles from "./profileCard.styles";
 type FormValues = {
 	username: string;
 	fullname: string;
+	email: string;
+	phone: string;
+	telegram: string;
+	url: string;
 	avatar?: FileWithPath;
 };
 
@@ -43,6 +47,19 @@ const ProfileCard: React.FC<Props> = ({
 		initialValues: initialValues,
 		validate: {
 			username: isNotEmpty("Username cannot be empty"),
+			email: isEmail("Not valid email"),
+			phone: matches(
+				/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
+				"Not valid phone"
+			),
+			telegram: (value) =>
+				value.length < 2 || value[0] !== "@"
+					? "Not valid telegram username (should start with @)"
+					: null,
+			url: matches(
+				/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,
+				"Not valid url"
+			),
 		},
 	});
 
@@ -75,6 +92,10 @@ const ProfileCard: React.FC<Props> = ({
 			await onSubmitProps({
 				username: form.isDirty("username") ? data.username : undefined,
 				fullname: form.isDirty("fullname") ? data.fullname : undefined,
+				email: form.isDirty("email") ? data.email : undefined,
+				phone: form.isDirty("phone") ? data.phone : undefined,
+				telegram: form.isDirty("telegram") ? data.telegram : undefined,
+				url: form.isDirty("url") ? data.url : undefined,
 			})
 		) {
 			if (data.avatar && form.isDirty("avatar"))
@@ -114,6 +135,8 @@ const ProfileCard: React.FC<Props> = ({
 						height={250}
 						maxSize={512000}
 						previewUrl={previewUrl}
+						mah={254}
+						maw={254}
 						{...form.getInputProps("avatar")}
 					/>
 					<SimpleGrid
@@ -123,12 +146,39 @@ const ProfileCard: React.FC<Props> = ({
 					>
 						<TextInput
 							label="Username"
+							placeholder="Username"
 							required
+                            autoComplete="username"
 							{...form.getInputProps("username")}
 						/>
 						<TextInput
 							label="Full name"
+							placeholder="Full name"
+                            autoComplete="name"
 							{...form.getInputProps("fullname")}
+						/>
+						<TextInput
+							label="Email"
+							placeholder="email@email.com"
+                            autoComplete="email"
+							{...form.getInputProps("email")}
+						/>
+						<TextInput
+							label="Phone"
+							placeholder="14924495029"
+                            autoComplete="tel"
+							{...form.getInputProps("phone")}
+						/>
+						<TextInput
+							label="Telegram"
+							placeholder="@username"
+							{...form.getInputProps("telegram")}
+						/>
+						<TextInput
+							label="Url"
+							placeholder="yoursite.com"
+                            autoComplete="url"
+							{...form.getInputProps("url")}
 						/>
 					</SimpleGrid>
 				</div>

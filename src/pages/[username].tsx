@@ -71,6 +71,10 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 				initialValues={{
 					username: profile.username,
 					fullname: profile.fullname ?? "",
+					email: profile.email ?? "",
+					phone: profile.phone ?? "",
+					telegram: profile.telegram ?? "",
+					url: profile.url ?? "",
 				}}
 				initialAvatarUrl={profile.avatarUrl ?? undefined}
 			/>

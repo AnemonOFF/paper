@@ -46,7 +46,14 @@ const HomePage: NextPage = () => {
 			<SettingsHeader />
 			<ProfileCard
 				onSubmit={createProfile}
-				initialValues={{ username: "", fullname: "" }}
+				initialValues={{
+					username: "",
+					fullname: "",
+					email: "",
+					phone: "",
+					telegram: "",
+					url: "",
+				}}
 			/>
 		</Box>
 	);

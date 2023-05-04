@@ -38,7 +38,14 @@ export default async function handle(
 }
 
 const updateProfile = async (username: string, body: any) => {
-	const { username: newUsername, fullname } = body;
+	const {
+		username: newUsername,
+		fullname,
+		email,
+		telegram,
+		phone,
+		url,
+	} = body;
 	if (newUsername) {
 		const oldProfile = await prisma.profile.findUnique({
 			where: { username: username.substring(1) },
@@ -60,6 +67,10 @@ const updateProfile = async (username: string, body: any) => {
 		data: {
 			fullname: fullname,
 			username: newUsername,
+			email: email,
+			phone: phone,
+			telegram: telegram,
+			url: url,
 		},
 	});
 };
