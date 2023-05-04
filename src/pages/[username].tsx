@@ -5,7 +5,6 @@ import { notifications } from "@mantine/notifications";
 import { Prisma, Profile } from "@prisma/client";
 import { IconX } from "@tabler/icons-react";
 import { GetServerSideProps, NextPage } from "next";
-import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const username = Array.isArray(context.params?.username)
@@ -30,8 +29,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const ProfilePage: NextPage<Profile> = (profile) => {
-	const router = useRouter();
-
 	const updateProfile = async (data: Prisma.ProfileUpdateInput) => {
 		try {
 			const response = await fetch(`/api/profile/@${profile.username}`, {
@@ -51,7 +48,9 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 					color: "red",
 					icon: <IconX />,
 				});
-			} else if (data.username) router.push(`/@${data.username}`);
+				return false;
+			}
+			return true;
 		} catch (err) {
 			if (err instanceof Error) {
 				notifications.show({
@@ -60,6 +59,7 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 					icon: <IconX />,
 				});
 			}
+			return false;
 		}
 	};
 
@@ -72,6 +72,7 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 					username: profile.username,
 					fullname: profile.fullname ?? "",
 				}}
+				initialAvatarUrl={profile.avatarUrl ?? undefined}
 			/>
 		</Box>
 	);

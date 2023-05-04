@@ -4,19 +4,17 @@ import { notifications } from "@mantine/notifications";
 import { Prisma } from "@prisma/client";
 import { IconX } from "@tabler/icons-react";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 
 const HomePage: NextPage = () => {
-	const router = useRouter();
-
-	const createProfile = async (data: Prisma.ProfileCreateInput) => {
+	const createProfile = async (data: Prisma.ProfileUpdateInput) => {
+		if (data.username === undefined) return false;
 		try {
 			const response = await fetch("/api/profile", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
 			});
-            if (!response.ok) {
+			if (!response.ok) {
 				const message = response.headers
 					.get("Content-Type")
 					?.includes("application/json")
@@ -28,8 +26,9 @@ const HomePage: NextPage = () => {
 					color: "red",
 					icon: <IconX />,
 				});
+				return false;
 			}
-            else router.push(`/@${data.username}`);
+			return true;
 		} catch (err) {
 			if (err instanceof Error) {
 				notifications.show({
@@ -38,6 +37,7 @@ const HomePage: NextPage = () => {
 					icon: <IconX />,
 				});
 			}
+			return false;
 		}
 	};
 

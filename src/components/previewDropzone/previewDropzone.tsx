@@ -5,7 +5,7 @@ import {
 	FileWithPath,
 } from "@mantine/dropzone";
 import { Group, Image, useMantineTheme } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import React from "react";
 import usePreviewDropzoneStyles from "./previewDropzone.styles";
@@ -21,6 +21,7 @@ type PreviewDropzoneProps = Partial<
 	error?: boolean;
 	width?: number | string;
 	height?: number | string;
+	previewUrl?: string;
 };
 
 const PreviewDropzone: React.FC<PreviewDropzoneProps> = ({
@@ -28,6 +29,7 @@ const PreviewDropzone: React.FC<PreviewDropzoneProps> = ({
 	onReject,
 	width,
 	height,
+	previewUrl,
 	error = false,
 	...props
 }) => {
@@ -35,8 +37,16 @@ const PreviewDropzone: React.FC<PreviewDropzoneProps> = ({
 	const theme = useMantineTheme();
 	const { classes, cx } = usePreviewDropzoneStyles();
 
+	useEffect(() => {
+		if (!previewUrl) return;
+		setFileUrl(previewUrl);
+	}, [previewUrl]);
+
 	const onFilesDrop = (files: FileWithPath[]) => {
-		setFileUrl(URL.createObjectURL(files[0]));
+		if (!previewUrl) {
+			setFileUrl(URL.createObjectURL(files[0]));
+			// if (fileUrl) URL.revokeObjectURL(fileUrl);
+		}
 		onDrop(files[0]);
 	};
 
