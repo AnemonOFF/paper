@@ -47,19 +47,28 @@ const ProfileCard: React.FC<Props> = ({
 		initialValues: initialValues,
 		validate: {
 			username: isNotEmpty("Username cannot be empty"),
-			email: isEmail("Not valid email"),
-			phone: matches(
-				/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
-				"Not valid phone"
-			),
-			telegram: (value) =>
-				value.length < 2 || value[0] !== "@"
-					? "Not valid telegram username (should start with @)"
-					: null,
-			url: matches(
-				/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,
-				"Not valid url"
-			),
+			email: (v) =>
+				!v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v)
+					? null
+					: "Not valid email",
+			phone: (v) =>
+				!v ||
+				/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
+					v
+				)
+					? null
+					: "Not valid phone",
+			telegram: (v) =>
+				!v || (v.length > 1 && v[0] === "@")
+					? null
+					: "Not valid telegram username (should start with @)",
+			url: (v) =>
+				!v ||
+				/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(
+					v
+				)
+					? null
+					: "Not valid url",
 		},
 	});
 
@@ -148,25 +157,25 @@ const ProfileCard: React.FC<Props> = ({
 							label="Username"
 							placeholder="Username"
 							required
-                            autoComplete="username"
+							autoComplete="username"
 							{...form.getInputProps("username")}
 						/>
 						<TextInput
 							label="Full name"
 							placeholder="Full name"
-                            autoComplete="name"
+							autoComplete="name"
 							{...form.getInputProps("fullname")}
 						/>
 						<TextInput
 							label="Email"
 							placeholder="email@email.com"
-                            autoComplete="email"
+							autoComplete="email"
 							{...form.getInputProps("email")}
 						/>
 						<TextInput
 							label="Phone"
 							placeholder="14924495029"
-                            autoComplete="tel"
+							autoComplete="tel"
 							{...form.getInputProps("phone")}
 						/>
 						<TextInput
@@ -177,7 +186,7 @@ const ProfileCard: React.FC<Props> = ({
 						<TextInput
 							label="Url"
 							placeholder="yoursite.com"
-                            autoComplete="url"
+							autoComplete="url"
 							{...form.getInputProps("url")}
 						/>
 					</SimpleGrid>
