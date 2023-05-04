@@ -1,6 +1,8 @@
-<h1 align="center">Reactium UI</h1>
-Simple CRUD API with UI for people profiles
-Build on NextJS, TS, Prisma, Mantine, formidable
+<h1 align="center">Paper</h1>
+
+💨 Simple CRUD API with UI for people profiles
+
+Build on [NextJS](https://nextjs.org/ "NextJS"), **TS**, [Prisma](https://www.prisma.io/ "Prisma"), [Mantine](https://mantine.dev/ "Mantine"), [formidable](https://github.com/node-formidable/formidable "formidable")
 
 ## Pull
 1.  Install all dependencies
