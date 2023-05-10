@@ -25,11 +25,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 	return {
-		props: profile,
+		props: {
+			profile,
+			bucket: process.env.S3Bucket,
+		},
 	};
 };
 
-const ProfilePage: NextPage<Profile> = (profile) => {
+const ProfilePage: NextPage<{ profile: Profile; bucket: string }> = ({
+	profile,
+	bucket,
+}) => {
 	const router = useRouter();
 
 	const updateProfile = async (data: Prisma.ProfileUpdateInput) => {
@@ -110,7 +116,11 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 					telegram: profile.telegram ?? "",
 					url: profile.url ?? "",
 				}}
-				initialAvatarUrl={profile.avatarUrl ?? undefined}
+				initialAvatarUrl={
+					`https://${bucket}.storage.yandexcloud.net/${
+						profile.avatarUrl
+					}` ?? undefined
+				}
 			/>
 		</Box>
 	);

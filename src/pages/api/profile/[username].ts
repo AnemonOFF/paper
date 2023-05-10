@@ -2,6 +2,7 @@ import prisma from "@/utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs/promises";
 import path from "path";
+import { deleteAvatar } from "../avatar/[username]";
 
 export default async function handle(
 	req: NextApiRequest,
@@ -46,22 +47,22 @@ const updateProfile = async (username: string, body: any) => {
 		phone,
 		url,
 	} = body;
-	if (newUsername) {
-		const oldProfile = await prisma.profile.findUnique({
-			where: { username: username.substring(1) },
-		});
-		if (oldProfile?.avatarUrl) {
-			await fs.rename(
-				path.join(process.cwd(), "public", oldProfile.avatarUrl),
-				path.join(
-					process.cwd(),
-					"public",
-					"avatars",
-					`${username}.${oldProfile.avatarUrl.split(".").pop()}`
-				)
-			);
-		}
-	}
+	// if (newUsername) {
+	// 	const oldProfile = await prisma.profile.findUnique({
+	// 		where: { username: username.substring(1) },
+	// 	});
+	// 	if (oldProfile?.avatarUrl) {
+	// 		await fs.rename(
+	// 			path.join(process.cwd(), "public", oldProfile.avatarUrl),
+	// 			path.join(
+	// 				process.cwd(),
+	// 				"public",
+	// 				"avatars",
+	// 				`${username}.${oldProfile.avatarUrl.split(".").pop()}`
+	// 			)
+	// 		);
+	// 	}
+	// }
 	return await prisma.profile.update({
 		where: { username: username.substring(1) },
 		data: {
@@ -82,7 +83,7 @@ const deleteProfile = async (username: string) => {
     if (profile?.avatarUrl) {
 		const filePath = path.join(process.cwd(), "public", profile.avatarUrl);
 		try {
-			await fs.rm(filePath);
+			await deleteAvatar(profile.avatarUrl)
 		} catch (err) {}
 	}
 	return await prisma.profile.delete({

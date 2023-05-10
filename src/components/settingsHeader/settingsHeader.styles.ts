@@ -4,14 +4,18 @@ const useSettingsHeaderStyles = createStyles((theme) => ({
 	header: {
 		display: "flex",
 		alignItems: "center",
-		justifyContent: "end",
+		justifyContent: "space-between",
+		padding: theme.spacing.md,
 	},
 
 	wrapper: {
-		margin: theme.spacing.md,
 		display: "flex",
 		alignItems: "center",
 		gap: theme.spacing.md,
+	},
+
+	link: {
+		color: theme.colorScheme === "dark" ? theme.white : theme.black,
 	},
 }));
 

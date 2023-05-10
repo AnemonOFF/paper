@@ -1,8 +1,8 @@
 import prisma from "@/utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs/promises";
-import path from "path";
 import formidable from "formidable";
+import { s3 } from "@/utils/s3";
 
 export const config = {
 	api: {
@@ -28,18 +28,20 @@ export default async function handle(
 	if (!profile) return res.status(404).end();
 
 	if (profile.avatarUrl) {
-		const filePath = path.join(process.cwd(), "public", profile.avatarUrl);
 		try {
-			await fs.rm(filePath);
-		} catch (err) {}
+			await deleteAvatar(profile.avatarUrl);
+		} catch (err) {
+			return res
+				.status(500)
+				.json({ message: "Avatar delete from YOS error" });
+		}
 	}
 	try {
 		const uploadResult = await uploadAvatar(req, username);
-		const filename = (uploadResult.files.file as formidable.File)
-			.newFilename;
+		const filename = uploadResult.filename;
 		const result = await prisma.profile.update({
 			where: { username: username.substring(1) },
-			data: { avatarUrl: `avatars/${filename}` },
+			data: { avatarUrl: filename },
 		});
 		return res.status(200).json(result);
 	} catch (err) {
@@ -47,19 +49,16 @@ export default async function handle(
 	}
 }
 
+export const deleteAvatar = async (filepath: string) => {
+	const remove = await s3.Remove(filepath);
+	if (remove === undefined) throw new Error("Avatar delete from YOS error");
+};
+
 const uploadAvatar = async (
 	req: NextApiRequest,
 	username: string
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
-	const uploadDir = path.join(process.cwd(), "public", "avatars");
-	try {
-		await fs.readdir(uploadDir);
-	} catch (err) {
-		await fs.mkdir(uploadDir);
-	}
-
+): Promise<{ filename: string; result: any }> => {
 	const options: formidable.Options = {
-		uploadDir,
 		maxFiles: 1,
 		maxFileSize: 512000,
 		filename: (name, ext, part, form) =>
@@ -68,9 +67,47 @@ const uploadAvatar = async (
 
 	const form = formidable(options);
 	return new Promise((resolve, reject) => {
-		form.parse(req, (err, fields, files) => {
+		form.parse(req, async (err, fields, files) => {
 			if (err) reject(err);
-			resolve({ fields, files });
+			const filename = (files.file as formidable.File).newFilename;
+			const filepath = (files.file as formidable.File).filepath;
+			const upload = await s3.Upload(
+				{
+					path: filepath,
+				},
+				"/avatars/"
+			);
+			await fs.rm(filepath);
+			if (upload === false) reject("YOS uploading error");
+			resolve({ filename: (upload as any).key, result: upload });
 		});
 	});
 };
+
+// const uploadAvatar = async (
+// 	req: NextApiRequest,
+// 	username: string
+// ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
+// 	const uploadDir = path.join(process.cwd(), "public", "avatars");
+// 	try {
+// 		await fs.readdir(uploadDir);
+// 	} catch (err) {
+// 		await fs.mkdir(uploadDir);
+// 	}
+
+// 	const options: formidable.Options = {
+// 		uploadDir,
+// 		maxFiles: 1,
+// 		maxFileSize: 512000,
+// 		filename: (name, ext, part, form) =>
+// 			`${username}.${part.mimetype?.split("/").pop()}`,
+// 	};
+
+// 	const form = formidable(options);
+// 	return new Promise((resolve, reject) => {
+// 		form.parse(req, (err, fields, files) => {
+// 			if (err) reject(err);
+// 			resolve({ fields, files });
+// 		});
+// 	});
+// };

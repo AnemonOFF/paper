@@ -10,6 +10,8 @@ export default async function handle(
 	const { username, fullname } = req.body;
 	if (username === undefined)
 		return res.status(400).json({ message: "username is required" });
+	if (await prisma.profile.findUnique({ where: { username: username } }))
+		return res.status(400).json({ message: "username already exists" });
 	const result = await prisma.profile.create({
 		data: {
 			username: username,
