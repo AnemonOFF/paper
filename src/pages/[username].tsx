@@ -5,6 +5,7 @@ import { notifications } from "@mantine/notifications";
 import { Prisma, Profile } from "@prisma/client";
 import { IconX } from "@tabler/icons-react";
 import { GetServerSideProps, NextPage } from "next";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const username = Array.isArray(context.params?.username)
@@ -29,6 +30,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const ProfilePage: NextPage<Profile> = (profile) => {
+	const router = useRouter();
+
 	const updateProfile = async (data: Prisma.ProfileUpdateInput) => {
 		try {
 			const response = await fetch(`/api/profile/@${profile.username}`, {
@@ -63,11 +66,42 @@ const ProfilePage: NextPage<Profile> = (profile) => {
 		}
 	};
 
+	const deleteProfile = async () => {
+		try {
+			const response = await fetch(`/api/profile/@${profile.username}`, {
+				method: "DELETE",
+			});
+			if (!response.ok) {
+				const message = response.headers
+					.get("Content-Type")
+					?.includes("application/json")
+					? (await response.json())["message"]
+					: undefined;
+				notifications.show({
+					title: response.statusText,
+					message: message,
+					color: "red",
+					icon: <IconX />,
+				});
+			} else router.push("/");
+		} catch (err) {
+			if (err instanceof Error) {
+				notifications.show({
+					message: err.message,
+					color: "red",
+					icon: <IconX />,
+				});
+			}
+			return false;
+		}
+	};
+
 	return (
 		<Box sx={{ height: "100vh" }}>
 			<SettingsHeader />
 			<ProfileCard
 				onSubmit={updateProfile}
+				onDelete={deleteProfile}
 				initialValues={{
 					username: profile.username,
 					fullname: profile.fullname ?? "",

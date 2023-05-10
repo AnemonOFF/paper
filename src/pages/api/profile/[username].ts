@@ -76,6 +76,15 @@ const updateProfile = async (username: string, body: any) => {
 };
 
 const deleteProfile = async (username: string) => {
+    const profile = await prisma.profile.findUnique({
+        where: { username: username.substring(1) },
+    });
+    if (profile?.avatarUrl) {
+		const filePath = path.join(process.cwd(), "public", profile.avatarUrl);
+		try {
+			await fs.rm(filePath);
+		} catch (err) {}
+	}
 	return await prisma.profile.delete({
 		where: { username: username.substring(1) },
 	});

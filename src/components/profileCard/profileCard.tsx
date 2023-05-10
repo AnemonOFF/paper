@@ -1,4 +1,5 @@
 import {
+	ActionIcon,
 	Button,
 	Group,
 	Paper,
@@ -10,7 +11,7 @@ import { FileRejection, FileWithPath } from "@mantine/dropzone";
 import { isEmail, isNotEmpty, matches, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { Prisma } from "@prisma/client";
-import { IconX } from "@tabler/icons-react";
+import { IconTrash, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import PreviewDropzone from "../previewDropzone";
@@ -29,11 +30,13 @@ type FormValues = {
 type Props = {
 	onSubmit: (data: Prisma.ProfileUpdateInput) => Promise<boolean>;
 	initialValues: FormValues;
+	onDelete?: () => void;
 	initialAvatarUrl?: string;
 };
 
 const ProfileCard: React.FC<Props> = ({
 	onSubmit: onSubmitProps,
+	onDelete,
 	initialValues,
 	initialAvatarUrl,
 }) => {
@@ -198,6 +201,16 @@ const ProfileCard: React.FC<Props> = ({
 					sx={{ justifyContent: "end" }}
 				>
 					<Button type="submit">Save profile</Button>
+					{onDelete && initialValues.username !== "" && (
+						<ActionIcon
+							variant="filled"
+							color="red"
+							size="lg"
+							onClick={onDelete}
+						>
+							<IconTrash />
+						</ActionIcon>
+					)}
 				</Group>
 			</form>
 		</Paper>
